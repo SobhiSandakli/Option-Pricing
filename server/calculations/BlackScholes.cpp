@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     double call_price = black_scholes_call(S, K, T, r, sigma);
 
     // Output the result
-    std::cout << "Black-Scholes European Call Option Price: " << call_price << std::endl;
+    std::cout << call_price << std::endl;
 
     return 0;
 }

@@ -15,3 +15,18 @@ export const calculateOptionPrice = async (data) => {
   }
   return responseData;
 };
+
+export const fetchHeatmapData = async ({ spotPrices, volatilities, strikePrice, timeToMaturity }) => {
+  const response = await fetch("http://127.0.0.1:5000/heatmap-data", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ spotPrices, volatilities, strikePrice, timeToMaturity }),
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to fetch heatmap data");
+  }
+
+  return data.heatmap; // Return the 2D heatmap array
+};
