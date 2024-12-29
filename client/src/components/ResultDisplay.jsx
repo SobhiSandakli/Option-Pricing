@@ -1,11 +1,14 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 
-function ResultDisplay({ result }) {
+function ResultDisplay({ result, optionType }) {
+  const backgroundColor = optionType === 'put' ? '#f44336' : '#4caf50'; // Red for put, green for call
+  const optionLabel = optionType === 'put' ? 'Put price' : 'Call price';
+
   return (
     <Box
       sx={{
-        backgroundColor: '#4caf50', // Green background
+        backgroundColor,
         padding: 2, // Reduced padding for smaller height
         borderRadius: 3, // Slightly larger border radius for a smoother look
         boxShadow: 6, // Stronger shadow for more depth
@@ -22,7 +25,7 @@ function ResultDisplay({ result }) {
       {result ? (
         <React.Fragment>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            {`Call price`}
+            {optionLabel}
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
             {result} $
