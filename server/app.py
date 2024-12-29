@@ -11,7 +11,6 @@ BLACK_SCHOLES_BINARY = "./calculations/black_scholes"  # Ensure this path points
 
 @app.route('/heatmap-data', methods=['POST'])
 def heatmap_data():
-    print("heatmap_data")
     try:
         data = request.json
         spot_prices = data.get('spotPrices', [])
@@ -19,6 +18,7 @@ def heatmap_data():
         T = data.get('timeToMaturity', 1)  # Default 1 year
         K = data.get('strikePrice', 100)   # Default strike price
         r = 0.05  # Risk-free interest rate
+        option_type = data.get('optionType', 'call')  # Default to call option
         if not spot_prices or not volatilities:
             return jsonify({"error": "Missing required spotPrices or volatilities"}), 400
 
@@ -28,22 +28,18 @@ def heatmap_data():
             row = []
             for sigma in volatilities:
                 # Call the C++ binary for each combination
-                print(f"S: {S}, K: {K}, T: {T}, r: {r}, sigma: {sigma}")
                 result = subprocess.run(
-                    [BLACK_SCHOLES_BINARY, str(S), str(K), str(T), str(r), str(sigma)],
+                    [BLACK_SCHOLES_BINARY, option_type, str(S), str(K), str(T), str(r), str(sigma)],
                     capture_output=True,
                     text=True
                 )
-                print(f"result in heatmap: {result}")
                 if result.returncode != 0:
                     return jsonify({"error": "Error executing the C++ program", "details": result.stderr}), 500
                 
                 # Parse and append the result
                 price = result.stdout.strip()
-                print(f"price: {price}")
                 row.append(price)
             heatmap_results.append(row)
-        print(f"heatmap_results: {heatmap_results}")
         return jsonify({"heatmap": heatmap_results})
 
     except Exception as e:
@@ -59,17 +55,16 @@ def calculate():
         T = data.get('timeToMaturity')  # Time to maturity (in years)
         r = 0.05  # Risk-free interest rate
         sigma = data.get('volatility')  # Volatility
-        print(f"S: {S}, K: {K}, T: {T}, r: {r}, sigma: {sigma}")
+        option_type = data.get('optionType', 'call')  # Default to call option
         if not all([S, K, T, r, sigma]):
             return jsonify({"error": "Missing required parameters"}), 400
 
         # Call the C++ binary with the parameters
         result = subprocess.run(
-            [BLACK_SCHOLES_BINARY, str(S), str(K), str(T), str(r), str(sigma)],
+            [BLACK_SCHOLES_BINARY, option_type, str(S), str(K), str(T), str(r), str(sigma)],
             capture_output=True,
             text=True
         )
-        print(f"result in /option-price: {result}")
         # Check for errors
         if result.returncode != 0:
             return jsonify({"error": "Error executing the C++ program", "details": result.stderr}), 500
