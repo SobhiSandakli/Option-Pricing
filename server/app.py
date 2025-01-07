@@ -19,6 +19,7 @@ def heatmap_data():
         K = data.get('strikePrice', 100)   # Default strike price
         r = 0.05  # Risk-free interest rate
         option_type = data.get('optionType', 'call')  # Default to call option
+        print(spot_prices)
         if not spot_prices or not volatilities:
             return jsonify({"error": "Missing required spotPrices or volatilities"}), 400
 
