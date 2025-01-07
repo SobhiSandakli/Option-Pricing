@@ -10,58 +10,70 @@ function Home() {
   const [putResult, setPutResult] = useState(null);
   const [callHeatmapData, setCallHeatmapData] = useState(null);
   const [putHeatmapData, setPutHeatmapData] = useState(null);
+  const [volatilities, setVolatilities] = useState([]);
+  const [spotPrices, setSpotPrices] = useState([]);
 
   const handleCalculate = async (formData) => {
     const { strikePrice, spotPrice, volatility, timeToMaturity } = formData;
-
-    const spotPrices = [
-      spotPrice,
+    const calculatedSpotPrices = [
+      spotPrice * 0.7,
+      spotPrice * 0.8,
+      spotPrice * 0.9,
+      parseFloat(spotPrice),
       spotPrice * 1.1,
       spotPrice * 1.2,
       spotPrice * 1.3,
-      spotPrice * 1.4,
-      spotPrice * 1.5,
     ];
-    const volatilities = [
-      volatility,
+    setSpotPrices(calculatedSpotPrices);
+    const calculatedVolatilities = [
+      volatility * 0.7,
+      volatility * 0.8,
+      volatility * 0.9,
+      parseFloat(volatility),
       volatility * 1.1,
       volatility * 1.2,
       volatility * 1.3,
-      volatility * 1.4,
-      volatility * 1.5,
     ];
+    setVolatilities(calculatedVolatilities);
 
     try {
-      // Calculate Call Option
-      const callHeatmap = await fetchHeatmapData({
-        spotPrices,
-        volatilities,
+      // Fetch both heatmaps in parallel
+      console.log(
+        calculatedSpotPrices,
+        calculatedVolatilities,
         strikePrice,
-        timeToMaturity,
-        optionType: "call",
-      });
+        timeToMaturity
+      );
+      const [callHeatmap, putHeatmap] = await Promise.all([
+        fetchHeatmapData({
+          spotPrices: calculatedSpotPrices,
+          volatilities: calculatedVolatilities,
+          strikePrice,
+          timeToMaturity,
+          optionType: "call",
+        }),
+        fetchHeatmapData({
+          spotPrices: calculatedSpotPrices,
+          volatilities: calculatedVolatilities,
+          strikePrice,
+          timeToMaturity,
+          optionType: "put",
+        }),
+      ]);
+      const [callResponse, putResponse] = await Promise.all([
+        calculateOptionPrice({
+          ...formData,
+          optionType: "call",
+        }),
+        calculateOptionPrice({
+          ...formData,
+          optionType: "put",
+        }),
+      ]);
+
       setCallHeatmapData(callHeatmap);
-
-      const callResponse = await calculateOptionPrice({
-        ...formData,
-        optionType: "call",
-      });
-      setCallResult(callResponse.option_price);
-
-      // Calculate Put Option
-      const putHeatmap = await fetchHeatmapData({
-        spotPrices,
-        volatilities,
-        strikePrice,
-        timeToMaturity,
-        optionType: "put",
-      });
       setPutHeatmapData(putHeatmap);
-
-      const putResponse = await calculateOptionPrice({
-        ...formData,
-        optionType: "put",
-      });
+      setCallResult(callResponse.option_price);
       setPutResult(putResponse.option_price);
     } catch (error) {
       console.error(error);
@@ -130,10 +142,12 @@ function Home() {
             }}
           >
             <ResultDisplay result={callResult} optionType="call" />
-            <Typography variant="h6" sx={{ marginTop: 2 }}>
-              Heatmap
-            </Typography>
-            <HeatmapComponent heatmapData={callHeatmapData} />
+            <Typography variant="h6" sx={{ marginTop: 2 }}></Typography>
+            <HeatmapComponent
+              heatmapData={callHeatmapData}
+              volatilities={volatilities}
+              spotPrices={spotPrices}
+            />
           </Box>
 
           {/* Put Option Section */}
@@ -150,10 +164,12 @@ function Home() {
             }}
           >
             <ResultDisplay result={putResult} optionType="put" />
-            <Typography variant="h6" sx={{ marginTop: 2 }}>
-              Heatmap
-            </Typography>
-            <HeatmapComponent heatmapData={putHeatmapData} />
+            <Typography variant="h6" sx={{ marginTop: 2 }}></Typography>
+            <HeatmapComponent
+              heatmapData={putHeatmapData}
+              volatilities={volatilities}
+              spotPrices={spotPrices}
+            />
           </Box>
         </Box>
       </Box>

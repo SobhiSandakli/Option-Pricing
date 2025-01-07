@@ -9,7 +9,8 @@ function InputForm({ onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ strikePrice, spotPrice, volatility, timeToMaturity });
+    const formattedVolatility = parseFloat(volatility) / 100; // Divide volatility by 100
+    onSubmit({ strikePrice, spotPrice, volatility: formattedVolatility, timeToMaturity });
   };
 
   return (
@@ -32,6 +33,7 @@ function InputForm({ onSubmit }) {
         value={spotPrice}
         onChange={(e) => setSpotPrice(e.target.value)}
         fullWidth
+        required
         InputLabelProps={{ style: { color: '#fff' } }}
         InputProps={{
           style: { color: 'white' },
@@ -50,6 +52,7 @@ function InputForm({ onSubmit }) {
         value={strikePrice}
         onChange={(e) => setStrikePrice(e.target.value)}
         fullWidth
+        required
         InputLabelProps={{ style: { color: '#fff' } }}
         InputProps={{
           style: { color: 'white' },
@@ -68,6 +71,7 @@ function InputForm({ onSubmit }) {
         value={volatility}
         onChange={(e) => setVolatility(e.target.value)}
         fullWidth
+        required
         InputLabelProps={{ style: { color: '#fff' } }}
         InputProps={{
           style: { color: 'white' },
@@ -86,6 +90,7 @@ function InputForm({ onSubmit }) {
         value={timeToMaturity}
         onChange={(e) => setTimeToMaturity(e.target.value)}
         fullWidth
+        required
         InputLabelProps={{ style: { color: '#fff' } }}
         InputProps={{
           style: { color: 'white' },
