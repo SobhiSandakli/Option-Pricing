@@ -3,13 +3,6 @@
 #include <cmath>
 #include <algorithm> // For std::max
 
-void printVector(const std::vector<double>& vec) {
-    for (double value : vec) {
-        std::cout << value << " ";
-    }
-    std::cout << std::endl;
-}
-
 double binomialOptionPricing(int N, double S0, double K, double r, double T, double sigma, bool isCall) {
     // Calculate derived parameters
     double dt = T / N; // Time step
@@ -24,39 +17,47 @@ double binomialOptionPricing(int N, double S0, double K, double r, double T, dou
     for (int j = 0; j <= N; ++j) {
         double ST = S0 * pow(u, j) * pow(d, N - j); // Stock price at node (N, j)
         optionValues[j] = isCall ? std::max(0.0, ST - K) : std::max(0.0, K - ST); // Payoff at maturity
-        printVector(optionValues);
     }
 
-    std::cout << std::endl;
-    // Backward induction to calculate the option price at the root
+    // Step back through the tree
     for (int i = N - 1; i >= 0; --i) {
         for (int j = 0; j <= i; ++j) {
-            std::cout << "i: " << i << " j: " << j << std::endl;
-            optionValues[j] = exp(-r * dt) * (p * optionValues[j + 1] + (1 - p) * optionValues[j]);
-            printVector(optionValues);
-
+            optionValues[j] = (p * optionValues[j + 1] + (1 - p) * optionValues[j]) * exp(-r * dt);
         }
     }
 
-    // The option price at the root node (0, 0)
     return optionValues[0];
 }
 
-int main() {
-    // Parameters
-    int N = 10; // Number of time steps
-    double S0 = 100.0; // Initial stock price
-    double K = 105.0; // Strike price
-    double r = 0.1; // Risk-free interest rate
-    double T = 1; // Time to maturity (1 year)
-    double sigma = 0.1; // Volatility
-    bool isCall = true; // True for call, false for put
+int main(int argc, char* argv[]) {
+    // Check if the correct number of parameters is passed
+    if (argc != 7) {
+        std::cerr << "Usage: " << argv[0] << " <option_type> <S0> <K> <T> <r> <sigma> <N>\n";
+        std::cerr << "  option_type: call or put\n";
+        std::cerr << "  S0: Current stock price\n";
+        std::cerr << "  K: Strike price\n";
+        std::cerr << "  T: Time to maturity (in years)\n";
+        std::cerr << "  r: Risk-free interest rate\n";
+        std::cerr << "  sigma: Volatility\n";
+        return 1;
+    }
 
-    // Calculate option price
-    double optionPrice = binomialOptionPricing(N, S0, K, r, T, sigma, isCall);
+    std::string option_type = argv[1];
+    double S0 = std::stod(argv[2]);
+    double K = std::stod(argv[3]);
+    double T = std::stod(argv[4]);
+    double r = std::stod(argv[5]);
+    double sigma = std::stod(argv[6]);
+    int N = 100;
 
-    // Output the result
-    std::cout << "Option Price: " << optionPrice << std::endl;
+    bool isCall = (option_type == "call");
+    if (option_type != "call" && option_type != "put") {
+        std::cerr << "Invalid option type. Use 'call' or 'put'.\n";
+        return 1;
+    }
+
+    double price = binomialOptionPricing(N, S0, K, r, T, sigma, isCall);
+    std::cout << price << std::endl;
 
     return 0;
 }
