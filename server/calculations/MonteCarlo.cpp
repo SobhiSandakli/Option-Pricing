@@ -1,17 +1,10 @@
 #include <iostream>
 #include <cmath>
 #include <random>
-#include <vector>
+#include <string>
 
-double monteCarloEuropeanCall(
-    double S0,        // Initial stock price
-    double K,         // Strike price
-    double r,         // Risk-free interest rate
-    double T,         // Time to maturity
-    double sigma,     // Volatility
-    int numSimulations // Number of Monte Carlo simulations
-) {
-    // Random number generator for normal distribution
+// Monte Carlo simulation for a European call option
+double monte_carlo_call(double S, double K, double T, double r, double sigma, int numSimulations) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::normal_distribution<> normalDist(0.0, 1.0);
@@ -19,38 +12,66 @@ double monteCarloEuropeanCall(
     double totalPayoff = 0.0;
 
     for (int i = 0; i < numSimulations; ++i) {
-        // Generate a random normal value
         double Z = normalDist(gen);
-
-        // Simulate the stock price at time T
-        double ST = S0 * std::exp((r - 0.5 * sigma * sigma) * T + sigma * std::sqrt(T) * Z);
-
-        // Calculate the payoff for a European call option
+        double ST = S * std::exp((r - 0.5 * sigma * sigma) * T + sigma * std::sqrt(T) * Z);
         double payoff = std::max(ST - K, 0.0);
-
-        // Accumulate the payoff
         totalPayoff += payoff;
     }
 
-    // Calculate the discounted average payoff
     double optionPrice = (totalPayoff / numSimulations) * std::exp(-r * T);
     return optionPrice;
 }
 
-int main() {
-    // Input parameters
-    double S0 = 70;          // Initial stock price
-    double K = 60;           // Strike price
-    double r = 0.1;            // Risk-free interest rate (5%)
-    double T = 1.0;             // Time to maturity (1 year)
-    double sigma = 0.2;         // Volatility (20%)
-    int numSimulations = 1000000; // Number of simulations
+// Monte Carlo simulation for a European put option
+double monte_carlo_put(double S, double K, double T, double r, double sigma, int numSimulations) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<> normalDist(0.0, 1.0);
 
-    // Calculate the option price using Monte Carlo
-    double optionPrice = monteCarloEuropeanCall(S0, K, r, T, sigma, numSimulations);
+    double totalPayoff = 0.0;
 
-    // Output the result
-    std::cout << "European Call Option Price: " << optionPrice << std::endl;
+    for (int i = 0; i < numSimulations; ++i) {
+        double Z = normalDist(gen);
+        double ST = S * std::exp((r - 0.5 * sigma * sigma) * T + sigma * std::sqrt(T) * Z);
+        double payoff = std::max(K - ST, 0.0);
+        totalPayoff += payoff;
+    }
 
+    double optionPrice = (totalPayoff / numSimulations) * std::exp(-r * T);
+    return optionPrice;
+}
+
+int main(int argc, char* argv[]) {
+    // Check if the correct number of parameters is passed
+    if (argc != 7) {
+        std::cerr << "Usage: " << argv[0] << " <option_type> <S> <K> <T> <r> <sigma> <numSimulations>\n";
+        std::cerr << "  option_type: call or put\n";
+        std::cerr << "  S: Current stock price\n";
+        std::cerr << "  K: Strike price\n";
+        std::cerr << "  T: Time to maturity (in years)\n";
+        std::cerr << "  r: Risk-free interest rate\n";
+        std::cerr << "  sigma: Volatility\n";
+        return 1;
+    }
+
+    std::string option_type = argv[1];
+    double S = std::stod(argv[2]);
+    double K = std::stod(argv[3]);
+    double T = std::stod(argv[4]);
+    double r = std::stod(argv[5]);
+    double sigma = std::stod(argv[6]);
+    int numSimulations = 10000;
+
+    double price;
+    if (option_type == "call") {
+        price = monte_carlo_call(S, K, T, r, sigma, numSimulations);
+    } else if (option_type == "put") {
+        price = monte_carlo_put(S, K, T, r, sigma, numSimulations);
+    } else {
+        std::cerr << "Invalid option type. Use 'call' or 'put'.\n";
+        return 1;
+    }
+
+    std::cout << price << std::endl;
     return 0;
 }

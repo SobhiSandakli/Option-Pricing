@@ -14,7 +14,15 @@ function Home() {
   const [spotPrices, setSpotPrices] = useState([]);
 
   const handleCalculate = async (formData) => {
-    const { strikePrice, spotPrice, volatility, timeToMaturity } = formData;
+    const {
+      strikePrice,
+      spotPrice,
+      volatility,
+      timeToMaturity,
+      riskFreeRate,
+      modelType,
+      viewType,
+    } = formData;
     const calculatedSpotPrices = [
       spotPrice * 0.7,
       spotPrice * 0.8,
@@ -42,7 +50,10 @@ function Home() {
         calculatedSpotPrices,
         calculatedVolatilities,
         strikePrice,
-        timeToMaturity
+        timeToMaturity,
+        riskFreeRate,
+        modelType,
+        viewType
       );
       const [callHeatmap, putHeatmap] = await Promise.all([
         fetchHeatmapData({
@@ -51,6 +62,9 @@ function Home() {
           strikePrice,
           timeToMaturity,
           optionType: "call",
+          riskFreeRate,
+          modelType,
+          viewType,
         }),
         fetchHeatmapData({
           spotPrices: calculatedSpotPrices,
@@ -58,8 +72,13 @@ function Home() {
           strikePrice,
           timeToMaturity,
           optionType: "put",
+          riskFreeRate,
+          modelType,
+          viewType,
         }),
       ]);
+      console.log("callHeatmap", callHeatmap);
+      console.log("formdata", formData);
       const [callResponse, putResponse] = await Promise.all([
         calculateOptionPrice({
           ...formData,
@@ -147,6 +166,8 @@ function Home() {
               heatmapData={callHeatmapData}
               volatilities={volatilities}
               spotPrices={spotPrices}
+              callPrice={callResult}
+              putPrice={0}
             />
           </Box>
 
@@ -169,6 +190,8 @@ function Home() {
               heatmapData={putHeatmapData}
               volatilities={volatilities}
               spotPrices={spotPrices}
+              callPrice={0}
+              putPrice={putResult}
             />
           </Box>
         </Box>

@@ -1,14 +1,19 @@
 import React from "react";
 import Plot from "react-plotly.js";
 
-const HeatmapComponent = ({ heatmapData, volatilities, spotPrices }) => {
+const HeatmapComponent = ({
+  heatmapData,
+  volatilities,
+  spotPrices,
+  callPrice,
+  putPrice,
+}) => {
   if (!heatmapData || !volatilities || !spotPrices) {
     return null;
   }
 
-  // Create ticktext for volatilities by multiplying by 100
-  const tickTextVolatilities = volatilities.map(v => (v * 100).toFixed(2));
-
+  const tickTextVolatilities = volatilities.map((v) => (v * 100).toFixed(2));
+  const referencePrice = callPrice > putPrice ? callPrice : putPrice;
   return (
     <Plot
       data={[
@@ -17,13 +22,21 @@ const HeatmapComponent = ({ heatmapData, volatilities, spotPrices }) => {
           x: volatilities,
           y: spotPrices,
           type: "heatmap",
-          colorscale: "Viridis",
+
+          colorscale: [
+            [0, "rgb(255, 0, 0)"], // red at the low end
+            [0.5, "rgb(255, 255, 255)"], // white at mid
+            [1, "rgb(0, 128, 0)"], // green at the high end
+          ],
+
+          zmid: referencePrice,
+
           showscale: true,
           text: heatmapData,
           texttemplate: "%{text}",
           textfont: {
             size: 12,
-            color: "white",
+            color: "black",
           },
         },
       ]}
@@ -36,7 +49,7 @@ const HeatmapComponent = ({ heatmapData, volatilities, spotPrices }) => {
           title: "Volatility (%)",
           tickmode: "array",
           tickvals: volatilities,
-          ticktext: tickTextVolatilities, // Display volatilities as percentages
+          ticktext: tickTextVolatilities,
           autorange: true,
         },
         yaxis: {
