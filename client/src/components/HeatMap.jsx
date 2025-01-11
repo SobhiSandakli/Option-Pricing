@@ -13,7 +13,7 @@ const HeatmapComponent = ({
   }
 
   const tickTextVolatilities = volatilities.map((v) => (v * 100).toFixed(2));
-  const referencePrice = callPrice > putPrice ? callPrice : putPrice;
+  const referencePrice = heatmapData[Math.floor(spotPrices.length / 2)][Math.floor(volatilities.length / 2)];
   return (
     <Plot
       data={[
