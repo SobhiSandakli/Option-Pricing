@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm> // For std::max
+#include <string>
 
 double binomialOptionPricing(int N, double S0, double K, double r, double T, double sigma, bool isCall) {
     // Calculate derived parameters
@@ -30,15 +31,19 @@ double binomialOptionPricing(int N, double S0, double K, double r, double T, dou
 }
 
 int main(int argc, char* argv[]) {
-    // Check if the correct number of parameters is passed
-    if (argc != 7) {
-        std::cerr << "Usage: " << argv[0] << " <option_type> <S0> <K> <T> <r> <sigma> <N>\n";
+    // Adjust the number of expected parameters:
+    // <option_type> <S0> <K> <T> <r> <sigma> <view> <reference_price>
+    if (argc != 9) {
+        std::cerr << "Usage: " << argv[0] 
+                  << " <option_type> <S0> <K> <T> <r> <sigma> <view> <reference_price>\n";
         std::cerr << "  option_type: call or put\n";
         std::cerr << "  S0: Current stock price\n";
         std::cerr << "  K: Strike price\n";
         std::cerr << "  T: Time to maturity (in years)\n";
         std::cerr << "  r: Risk-free interest rate\n";
         std::cerr << "  sigma: Volatility\n";
+        std::cerr << "  view: price or P&L\n";
+        std::cerr << "  reference_price: reference option price for P&L\n";
         return 1;
     }
 
@@ -48,7 +53,9 @@ int main(int argc, char* argv[]) {
     double T = std::stod(argv[4]);
     double r = std::stod(argv[5]);
     double sigma = std::stod(argv[6]);
-    int N = 100;
+    std::string view = argv[7];
+    double reference_price = std::stod(argv[8]);
+    int N = 100; // Number of time steps
 
     bool isCall = (option_type == "call");
     if (option_type != "call" && option_type != "put") {
@@ -57,7 +64,12 @@ int main(int argc, char* argv[]) {
     }
 
     double price = binomialOptionPricing(N, S0, K, r, T, sigma, isCall);
-    std::cout << price << std::endl;
 
+    // If we're in P&L view, subtract the reference price
+    if (view == "P&L") {
+        price = price - reference_price;
+    }
+
+    std::cout << price << std::endl;
     return 0;
 }

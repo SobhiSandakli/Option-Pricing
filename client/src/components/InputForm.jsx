@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
 
 function InputForm({ onSubmit }) {
@@ -18,6 +18,8 @@ function InputForm({ onSubmit }) {
     riskFreeRate: true,
   });
 
+  const [autoSubmit, setAutoSubmit] = useState(false);
+
   const handleBlur = (field, value) => {
     setIsValid((prev) => ({
       ...prev,
@@ -25,19 +27,20 @@ function InputForm({ onSubmit }) {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     const formattedVolatility = parseFloat(volatility) / 100; // Divide volatility by 100
     const formattedRiskFreeRate = parseFloat(riskFreeRate) / 100; // Divide risk-free rate by 100
+    const formattedTimeToMaturity = parseFloat(timeToMaturity) / 12; // Divide time to maturity by 12
     onSubmit({
       strikePrice,
       spotPrice,
       volatility: formattedVolatility,
-      timeToMaturity,
+      timeToMaturity : formattedTimeToMaturity,
       riskFreeRate: formattedRiskFreeRate,
       modelType: selectedModel,
       viewType: selectedOption,
     });
+    setAutoSubmit(true);
   };
 
   const handleModelChange = (event, newModel) => {
@@ -48,14 +51,20 @@ function InputForm({ onSubmit }) {
 
   const handleOptionChange = (event, newOption) => {
     if (newOption !== null) {
+      console.log(newOption);
       setSelectedOption(newOption);
     }
   };
 
+  useEffect(() => {
+    if (autoSubmit) {
+      handleSubmit();
+    }
+  }, [strikePrice, spotPrice, volatility, timeToMaturity, riskFreeRate, selectedModel, selectedOption]);
+
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -129,7 +138,7 @@ function InputForm({ onSubmit }) {
         }}
       />
       <TextField
-        label="Time to Maturity (Years)"
+        label="Time to Maturity (Months)"
         variant="outlined"
         type="number"
         value={timeToMaturity}
@@ -170,6 +179,7 @@ function InputForm({ onSubmit }) {
           },
         }}
       />
+
       <ToggleButtonGroup
         color="primary"
         value={selectedModel}
@@ -196,8 +206,8 @@ function InputForm({ onSubmit }) {
         }}
       >
         <ToggleButton value="Black-Scholes">Black-Scholes</ToggleButton>
-        <ToggleButton value="Binomial">Binomial</ToggleButton>
         <ToggleButton value="Monte Carlo">Monte Carlo</ToggleButton>
+        <ToggleButton value="Binomial">Binomial</ToggleButton>
       </ToggleButtonGroup>
       <ToggleButtonGroup
         color="primary"
@@ -228,11 +238,14 @@ function InputForm({ onSubmit }) {
         <ToggleButton value="P&L">P&L</ToggleButton>
       </ToggleButtonGroup>
       <Button
-        type="submit"
         variant="contained"
+        color="primary"
+        onClick={handleSubmit}
         sx={{
-          backgroundColor: "#4caf50",
-          "&:hover": { backgroundColor: "#388e3c" },
+          backgroundColor: "#4caf50", // Green color
+          "&:hover": {
+            backgroundColor: "#388e3c", // Darker green on hover
+          },
         }}
       >
         Calculate
