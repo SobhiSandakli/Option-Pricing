@@ -23,22 +23,22 @@ function InputForm({ onSubmit }) {
   const handleBlur = (field, value) => {
     setIsValid((prev) => ({
       ...prev,
-      [field]: value !== "" && !isNaN(value),
+      [field]: value !== "" && !isNaN(value) && value >= 0,
     }));
   };
 
   const handleSubmit = () => {
     const formattedVolatility = parseFloat(volatility) / 100; // Divide volatility by 100
     const formattedRiskFreeRate = parseFloat(riskFreeRate) / 100; // Divide risk-free rate by 100
-    const formattedTimeToMaturity = parseFloat(timeToMaturity) / 12; // Divide time to maturity by 12
+    const formattedTimeToMaturity = parseFloat(timeToMaturity) / 12; // Convert months to years
     onSubmit({
       strikePrice,
       spotPrice,
       volatility: formattedVolatility,
-      timeToMaturity : formattedTimeToMaturity,
+      timeToMaturity: formattedTimeToMaturity,
       riskFreeRate: formattedRiskFreeRate,
       modelType: selectedModel,
-      viewType: selectedOption,
+      optionType: selectedOption,
     });
     setAutoSubmit(true);
   };
@@ -51,7 +51,6 @@ function InputForm({ onSubmit }) {
 
   const handleOptionChange = (event, newOption) => {
     if (newOption !== null) {
-      console.log(newOption);
       setSelectedOption(newOption);
     }
   };
@@ -61,6 +60,14 @@ function InputForm({ onSubmit }) {
       handleSubmit();
     }
   }, [strikePrice, spotPrice, volatility, timeToMaturity, riskFreeRate, selectedModel, selectedOption]);
+
+  const handleInputChange = (setter, max) => (e) => {
+    const value = e.target.value;
+    const regex = /^\d*\.?\d{0,3}$/;
+    if (regex.test(value) && value <= max) {
+      setter(value);
+    }
+  };
 
   return (
     <Box
@@ -79,10 +86,11 @@ function InputForm({ onSubmit }) {
         variant="outlined"
         type="number"
         value={spotPrice}
-        onChange={(e) => setSpotPrice(e.target.value)}
+        onChange={handleInputChange(setSpotPrice, 50000)}
         onBlur={(e) => handleBlur("spotPrice", e.target.value)}
         fullWidth
         required
+        inputProps={{ step: "0.001", min: 0, max: 50000 }}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -100,10 +108,11 @@ function InputForm({ onSubmit }) {
         variant="outlined"
         type="number"
         value={strikePrice}
-        onChange={(e) => setStrikePrice(e.target.value)}
+        onChange={handleInputChange(setStrikePrice, 50000)}
         onBlur={(e) => handleBlur("strikePrice", e.target.value)}
         fullWidth
         required
+        inputProps={{ step: "0.001", min: 0, max: 50000 }}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -121,10 +130,11 @@ function InputForm({ onSubmit }) {
         variant="outlined"
         type="number"
         value={volatility}
-        onChange={(e) => setVolatility(e.target.value)}
+        onChange={handleInputChange(setVolatility, 5000)}
         onBlur={(e) => handleBlur("volatility", e.target.value)}
         fullWidth
         required
+        inputProps={{ step: "0.001", min: 0, max: 5000 }}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -142,10 +152,11 @@ function InputForm({ onSubmit }) {
         variant="outlined"
         type="number"
         value={timeToMaturity}
-        onChange={(e) => setTimeToMaturity(e.target.value)}
+        onChange={handleInputChange(setTimeToMaturity, 99)}
         onBlur={(e) => handleBlur("timeToMaturity", e.target.value)}
         fullWidth
         required
+        inputProps={{ step: "0.001", min: 0, max: 99 }}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -163,10 +174,11 @@ function InputForm({ onSubmit }) {
         variant="outlined"
         type="number"
         value={riskFreeRate}
-        onChange={(e) => setRiskFreeRate(e.target.value)}
+        onChange={handleInputChange(setRiskFreeRate, 99)}
         onBlur={(e) => handleBlur("riskFreeRate", e.target.value)}
         fullWidth
         required
+        inputProps={{ step: "0.001", min: 0, max: 99 }}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -179,7 +191,6 @@ function InputForm({ onSubmit }) {
           },
         }}
       />
-
       <ToggleButtonGroup
         color="primary"
         value={selectedModel}
