@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+} from "@mui/material";
 
 function InputForm({ onSubmit }) {
   const [strikePrice, setStrikePrice] = useState("");
@@ -38,7 +45,7 @@ function InputForm({ onSubmit }) {
       timeToMaturity: formattedTimeToMaturity,
       riskFreeRate: formattedRiskFreeRate,
       modelType: selectedModel,
-      optionType: selectedOption,
+      viewType: selectedOption,
     });
     setAutoSubmit(true);
   };
@@ -59,7 +66,15 @@ function InputForm({ onSubmit }) {
     if (autoSubmit) {
       handleSubmit();
     }
-  }, [strikePrice, spotPrice, volatility, timeToMaturity, riskFreeRate, selectedModel, selectedOption]);
+  }, [
+    strikePrice,
+    spotPrice,
+    volatility,
+    timeToMaturity,
+    riskFreeRate,
+    selectedModel,
+    selectedOption,
+  ]);
 
   const handleInputChange = (setter, max) => (e) => {
     const value = e.target.value;
@@ -98,8 +113,12 @@ function InputForm({ onSubmit }) {
         sx={{
           ".MuiOutlinedInput-root": {
             "& fieldset": { borderColor: isValid.spotPrice ? "white" : "red" },
-            "&:hover fieldset": { borderColor: isValid.spotPrice ? "#4caf50" : "red" },
-            "&.Mui-focused fieldset": { borderColor: isValid.spotPrice ? "#4caf50" : "red" },
+            "&:hover fieldset": {
+              borderColor: isValid.spotPrice ? "#4caf50" : "red",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: isValid.spotPrice ? "#4caf50" : "red",
+            },
           },
         }}
       />
@@ -119,9 +138,15 @@ function InputForm({ onSubmit }) {
         }}
         sx={{
           ".MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: isValid.strikePrice ? "white" : "red" },
-            "&:hover fieldset": { borderColor: isValid.strikePrice ? "#4caf50" : "red" },
-            "&.Mui-focused fieldset": { borderColor: isValid.strikePrice ? "#4caf50" : "red" },
+            "& fieldset": {
+              borderColor: isValid.strikePrice ? "white" : "red",
+            },
+            "&:hover fieldset": {
+              borderColor: isValid.strikePrice ? "#4caf50" : "red",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: isValid.strikePrice ? "#4caf50" : "red",
+            },
           },
         }}
       />
@@ -142,8 +167,12 @@ function InputForm({ onSubmit }) {
         sx={{
           ".MuiOutlinedInput-root": {
             "& fieldset": { borderColor: isValid.volatility ? "white" : "red" },
-            "&:hover fieldset": { borderColor: isValid.volatility ? "#4caf50" : "red" },
-            "&.Mui-focused fieldset": { borderColor: isValid.volatility ? "#4caf50" : "red" },
+            "&:hover fieldset": {
+              borderColor: isValid.volatility ? "#4caf50" : "red",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: isValid.volatility ? "#4caf50" : "red",
+            },
           },
         }}
       />
@@ -163,9 +192,15 @@ function InputForm({ onSubmit }) {
         }}
         sx={{
           ".MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: isValid.timeToMaturity ? "white" : "red" },
-            "&:hover fieldset": { borderColor: isValid.timeToMaturity ? "#4caf50" : "red" },
-            "&.Mui-focused fieldset": { borderColor: isValid.timeToMaturity ? "#4caf50" : "red" },
+            "& fieldset": {
+              borderColor: isValid.timeToMaturity ? "white" : "red",
+            },
+            "&:hover fieldset": {
+              borderColor: isValid.timeToMaturity ? "#4caf50" : "red",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: isValid.timeToMaturity ? "#4caf50" : "red",
+            },
           },
         }}
       />
@@ -185,37 +220,55 @@ function InputForm({ onSubmit }) {
         }}
         sx={{
           ".MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: isValid.riskFreeRate ? "white" : "red" },
-            "&:hover fieldset": { borderColor: isValid.riskFreeRate ? "#4caf50" : "red" },
-            "&.Mui-focused fieldset": { borderColor: isValid.riskFreeRate ? "#4caf50" : "red" },
+            "& fieldset": {
+              borderColor: isValid.riskFreeRate ? "white" : "red",
+            },
+            "&:hover fieldset": {
+              borderColor: isValid.riskFreeRate ? "#4caf50" : "red",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: isValid.riskFreeRate ? "#4caf50" : "red",
+            },
           },
         }}
       />
       <ToggleButtonGroup
-        color="primary"
-        value={selectedModel}
-        exclusive
-        onChange={handleModelChange}
-        aria-label="Model Type"
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          "& .MuiToggleButton-root": {
-            backgroundColor: "#002b5c", // Navy for unselected
-            color: "#fff",
-            borderColor: "#fff", // White outline
-            "&.Mui-selected": {
-              backgroundColor: "#4caf50", // Green like the Calculate button
-              color: "#fff",
-            },
-            "&:hover": {
-              backgroundColor: "#227925", // Green for hover
-              color: "#fff",
-            },
-            flex: 1, // Ensure equal width
-          },
-        }}
-      >
+  color="primary"
+  value={selectedModel}
+  exclusive
+  onChange={handleModelChange}
+  aria-label="Model Type"
+  sx={{
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    overflow: "hidden",
+    "& .MuiToggleButton-root": {
+      backgroundColor: "#003f5c", // Unselected color
+      color: "#fff",
+      borderColor: "#fff",        // White outline
+      "&.Mui-selected": {
+        backgroundColor: "#4caf50", // Selected color
+        color: "#fff",
+      },
+      "&:hover": {
+        backgroundColor: "#227925", // Hover color
+        color: "#fff",
+      },
+      // Larger screens (≥659px)
+      "@media (min-width: 659px)": {
+        fontSize: "0.65rem",
+        width: "100%",
+        minWidth: "auto",
+        padding: "2px 6px",
+      },
+      // Smaller screens (<659px)
+      "@media (max-width: 658px)": {
+        flex: 1, // Let buttons fill available width
+      },
+    },
+  }}
+>
         <ToggleButton value="Black-Scholes">Black-Scholes</ToggleButton>
         <ToggleButton value="Monte Carlo">Monte Carlo</ToggleButton>
         <ToggleButton value="Binomial">Binomial</ToggleButton>
@@ -230,7 +283,7 @@ function InputForm({ onSubmit }) {
           display: "flex",
           justifyContent: "center",
           "& .MuiToggleButton-root": {
-            backgroundColor: "#002b5c", // Navy for unselected
+            backgroundColor: "##003f5c", // Navy for unselected
             color: "#fff",
             borderColor: "#fff", // White outline
             "&.Mui-selected": {

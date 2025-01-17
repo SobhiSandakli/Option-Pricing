@@ -1,0 +1,178 @@
+/* Reset body/html to remove default padding and margin, 
+   ensuring the background spans the entire screen height */
+   html,
+   body {
+     margin: 0;
+     padding: 0;
+     height: 100%;
+     font-family: sans-serif;
+     box-sizing: border-box;
+   }
+   
+   /* Apply box-sizing to all elements */
+   *,
+   *::before,
+   *::after {
+     box-sizing: inherit;
+   }
+   
+   /* Main container fills the viewport and uses flex layout */
+   .homeContainer {
+     background-color: #001f3f;
+     min-height: 100vh; /* Ensures full screen coverage */
+     color: white;
+     display: flex;
+     flex-direction: column; 
+     padding-left: 16px;
+     padding-right: 16px;
+     width: 100%;
+   }
+   
+   /* Top Title Styling */
+   .topTitle {
+     text-align: center;
+     margin-bottom: 16px;
+     margin-block-start: 0;
+   }
+
+   .subTitle {
+     margin-block-start: 0;
+     color: #86c69c; 
+   }
+
+   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400&display=swap');
+
+   .topTitle {
+     font-family: 'Playfair Display', serif;
+     font-size: 3rem;
+     text-align: center;
+     margin-bottom: 8px; /* Reduced margin */
+     color: #fff;
+   }
+ 
+   .subTitle {
+     font-family: 'Lato', sans-serif;
+     font-size: 1.5rem;
+     text-align: center;
+     margin-bottom: 16px; /* Reduced margin */
+     color: #86c69c; 
+
+   }
+   
+   /* The wrapper that holds the input and the heatmaps */
+   .layoutWrapper {
+     display: flex;
+     flex-direction: column; /* Default to column on small screens */
+     width: 100%;
+     gap: 16px;
+   }
+   
+   /* Input Section */
+   .inputSection {
+     background-color: #003f5c;
+     padding: 16px;
+     border-radius: 8px;
+     box-shadow: 0px 2px 6px rgba(0,0,0,0.3);
+     /* Width will be controlled by media queries */
+   }
+   
+   /* Container for both call & put heatmaps */
+   .heatmapsContainer {
+     display: flex;
+     flex-wrap: wrap; /* Allows heatmap boxes to wrap as needed */
+     gap: 16px;
+     width: 100%; /* Will be controlled by media queries */
+   }
+   
+   /* Each heatmap box */
+   .heatmapBox {
+     background-color: #003f5c;
+     padding: 16px;
+     border-radius: 8px;
+     box-shadow: 0px 2px 6px rgba(0,0,0,0.3);
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     gap: 16px; 
+
+     /* Width will be set per media queries */
+   }
+   
+   /* =========================
+      MEDIA QUERIES
+      ========================= */
+   
+   /* Large screens (desktop, ≥1024px)
+      - Input: 20%
+      - Heatmaps combined: 80% (each heatmap ~40%)
+   */
+   @media (min-width: 1140px) {
+     .layoutWrapper {
+       flex-direction: row;
+       align-items: flex-start;
+     }
+   
+     .inputSection {
+       width: 20%;
+     }
+   
+     .heatmapsContainer {
+       width: 80%;
+       display: flex;
+       flex-wrap: nowrap; /* Keep them side by side */
+     }
+   
+     /* Two heatmaps side by side => each ~ 40% total
+        (50% of the .heatmapsContainer which is 80% total) */
+     .heatmapBox {
+       width: 50%;
+       min-width: 0; 
+     }
+   }
+   
+   /* Medium screens (600px–1023px)
+      - Input: 30%
+      - Heatmaps: 70% (each ~35% total if side by side)
+   */
+   @media (min-width: 660px) and (max-width: 1139px) {
+     .layoutWrapper {
+       flex-direction: row;
+       align-items: flex-start;
+     }
+   
+     .inputSection {
+       width: 30%;
+     }
+   
+     .heatmapsContainer {
+       width: 100%;
+       display: flex;
+       flex-wrap: wrap; /* Just in case it needs to wrap */
+     }
+   
+     .heatmapBox {
+       width: 100%;
+       min-width: 0;
+     }
+   }
+   
+   /* Small screens (<600px)
+      - Everything stacked vertically at 100%
+   */
+   @media (max-width: 659px) {
+     .layoutWrapper {
+       flex-direction: column;
+       align-items: stretch;
+     }
+   
+     .inputSection,
+     .heatmapsContainer {
+       width: 100%;
+     }
+   
+     /* Each heatmap takes full width in a vertical stack */
+     .heatmapBox {
+       width: 100%;
+       min-width: 0;
+     }
+   }
