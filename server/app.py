@@ -9,7 +9,6 @@ CORS(app)
 import os
 
 app_root = os.path.dirname(os.path.abspath(__file__))  # Gets the absolute path of the current script
-print(app_root)
 BLACK_SCHOLES_BINARY = os.path.join(app_root, 'calculations', 'black_scholes')
 MONTE_CARLO_BINARY = os.path.join(app_root, 'calculations', 'monte_carlo')
 BINOMIAL_TREE_BINARY = os.path.join(app_root, 'calculations', 'binomial_tree')
