@@ -1,6 +1,5 @@
 export const calculateOptionPrice = async (data) => {
   console.log("sending data to the frontend api", data);
-  console.log('API URL:', apiUrl);
   const apiUrl = process.env.REACT_APP_API_URL; // Get the URL from environment variable
   const response = await fetch(`${apiUrl}/option-price`, {
     method: "POST",
