@@ -6,12 +6,22 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-BLACK_SCHOLES_BINARY = "./calculations/black_scholes"
-MONTE_CARLO_BINARY = "./calculations/monte_carlo"
-BINOMIAL_TREE_BINARY = "./calculations/binomial_tree"
+import os
+
+app_root = os.path.dirname(os.path.abspath(__file__))  # Gets the absolute path of the current script
+BLACK_SCHOLES_BINARY = os.path.join(app_root, 'calculations', 'black_scholes')
+MONTE_CARLO_BINARY = os.path.join(app_root, 'calculations', 'monte_carlo')
+BINOMIAL_TREE_BINARY = os.path.join(app_root, 'calculations', 'binomial_tree')
+
+
+
+@app.route('/')
+def home():
+    return 'The api.optimap.ca is running! Thanks for checking it out! \n Check out optimap.ca for more information.'
 
 @app.route('/heatmap-data', methods=['POST'])
 def heatmap_data():
+
     try:
         data = request.json
         spot_prices = data.get('spotPrices', [])

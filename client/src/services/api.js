@@ -1,6 +1,7 @@
 export const calculateOptionPrice = async (data) => {
   console.log("sending data to the frontend api", data);
-  const response = await fetch("http://127.0.0.1:5000/option-price", {
+  const apiUrl = process.env.REACT_APP_API_URL; // Get the URL from environment variable
+  const response = await fetch(`${apiUrl}/option-price`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -27,7 +28,8 @@ export const fetchHeatmapData = async ({
   viewType,
 }) => {
   console.log("fetching heatmap data for ", optionType);
-  const response = await fetch("http://127.0.0.1:5000/heatmap-data", {
+  const apiUrl = process.env.REACT_APP_API_URL; // Get the URL from environment variable
+  const response = await fetch(`${apiUrl}/heatmap-data`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
