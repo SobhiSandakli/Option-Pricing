@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import InputForm from "../components/InputForm";
 import ResultDisplay from "../components/ResultDisplay";
 import HeatmapComponent from "../components/HeatMap";
-import { Box, Typography } from "@mui/material";
 import { calculateOptionPrice, fetchHeatmapData } from "../services/api";
+
+// Import the external CSS
+import "./Home.css";
+
 
 function Home() {
   const [callResult, setCallResult] = useState(null);
@@ -23,6 +26,7 @@ function Home() {
       modelType,
       viewType,
     } = formData;
+
     const calculatedSpotPrices = [
       spotPrice * 0.7,
       spotPrice * 0.8,
@@ -33,6 +37,7 @@ function Home() {
       spotPrice * 1.3,
     ];
     setSpotPrices(calculatedSpotPrices);
+
     const calculatedVolatilities = [
       volatility * 0.7,
       volatility * 0.8,
@@ -45,16 +50,6 @@ function Home() {
     setVolatilities(calculatedVolatilities);
 
     try {
-      // Fetch both heatmaps in parallel
-      console.log(
-        calculatedSpotPrices,
-        calculatedVolatilities,
-        strikePrice,
-        timeToMaturity,
-        riskFreeRate,
-        modelType,
-        viewType
-      );
       const [callHeatmap, putHeatmap] = await Promise.all([
         fetchHeatmapData({
           spotPrices: calculatedSpotPrices,
@@ -77,8 +72,7 @@ function Home() {
           viewType,
         }),
       ]);
-      console.log("callHeatmap", callHeatmap);
-      console.log("formdata", formData);
+
       const [callResponse, putResponse] = await Promise.all([
         calculateOptionPrice({
           ...formData,
@@ -100,68 +94,21 @@ function Home() {
   };
 
   return (
-    <Box
-      sx={{
-        backgroundColor: "#001f3f",
-        minHeight: "100vh", // Ensure the background covers the full viewport height
-        color: "white",
-        display: "flex",
-        flexDirection: "row", // Arrange children horizontally
-      }}
-    >
-      {/* Left Side: Input Form */}
-      <Box
-        sx={{
-          width: "20%", // Adjust the width as needed
-          backgroundColor: "#002b5c",
-          padding: 2,
-          borderRadius: 2,
-          boxShadow: 3,
-        }}
-      >
-        <InputForm onSubmit={handleCalculate} />
-      </Box>
+    <div className="homeContainer">
+      <h1 className="topTitle">OptiMap</h1>
+      <h2 className="subTitle">Visualize the price and P&L of an option as its sensitivity to market fluctuations changes</h2>
 
-      {/* Right Side: Title and Option Sections */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: "flex",
-          flexDirection: "column", // Arrange title and option sections vertically
-          alignItems: "center",
-          padding: 2,
-        }}
-      >
-        {/* Title */}
-        <Typography variant="h3" align="center" sx={{ marginBottom: 2 }}>
-          Option Pricing Tool
-        </Typography>
+      <div className="layoutWrapper">
+        {/* Input */}
+        <div className="inputSection">
+          <InputForm onSubmit={handleCalculate} />
+        </div>
 
-        {/* Option Sections */}
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row", // Arrange call and put sections horizontally
-            gap: 2,
-            width: "100%",
-            justifyContent: "center",
-          }}
-        >
-          {/* Call Option Section */}
-          <Box
-            sx={{
-              flex: 1,
-              backgroundColor: "#003f5c",
-              padding: 2,
-              borderRadius: 2,
-              boxShadow: 3,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+        {/* Heatmaps */}
+        <div className="heatmapsContainer">
+          {/* Call Heatmap */}
+          <div className="heatmapBox">
             <ResultDisplay result={callResult} optionType="call" />
-            <Typography variant="h6" sx={{ marginTop: 2 }}></Typography>
             <HeatmapComponent
               heatmapData={callHeatmapData}
               volatilities={volatilities}
@@ -169,23 +116,10 @@ function Home() {
               callPrice={callResult}
               putPrice={0}
             />
-          </Box>
-
-          {/* Put Option Section */}
-          <Box
-            sx={{
-              flex: 1,
-              backgroundColor: "#003f5c",
-              padding: 2,
-              borderRadius: 2,
-              boxShadow: 3,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+          </div>
+          {/* Put Heatmap */}
+          <div className="heatmapBox">
             <ResultDisplay result={putResult} optionType="put" />
-            <Typography variant="h6" sx={{ marginTop: 2 }}></Typography>
             <HeatmapComponent
               heatmapData={putHeatmapData}
               volatilities={volatilities}
@@ -193,10 +127,10 @@ function Home() {
               callPrice={0}
               putPrice={putResult}
             />
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

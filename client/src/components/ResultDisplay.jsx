@@ -13,8 +13,8 @@ function ResultDisplay({ result, optionType }) {
         borderRadius: 3, // Slightly larger border radius for a smoother look
         boxShadow: 6, // Stronger shadow for more depth
         height: 'auto', // Let the box size adjust based on content
-        minWidth: 400, // Limit the width for a more contained look
         maxHeight: 120, // Limit the height to prevent it from growing too much
+        width: '100%', // Fixed width to prevent it from growing
         margin: '0 auto', // Center it horizontally
         display: 'flex',
         flexDirection: 'column',
