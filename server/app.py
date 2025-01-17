@@ -10,6 +10,11 @@ BLACK_SCHOLES_BINARY = "./calculations/black_scholes"
 MONTE_CARLO_BINARY = "./calculations/monte_carlo"
 BINOMIAL_TREE_BINARY = "./calculations/binomial_tree"
 
+
+@app.route('/')
+def home():
+    return 'Hello, World!'
+
 @app.route('/heatmap-data', methods=['POST'])
 def heatmap_data():
     try:
