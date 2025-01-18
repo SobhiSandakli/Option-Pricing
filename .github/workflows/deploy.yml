@@ -16,7 +16,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.12'  # Ensure this matches your Python version
+        python-version: '3.12'
 
     - name: Install dependencies
       run: |
@@ -30,8 +30,8 @@ jobs:
 
     - name: Compile C++ code
       run: |
-        cd server/calculations  # Change to your C++ code directory
-        g++ -o monte_carlo MonteCarlo.cpp -lm    # Compile your C++ files
+        cd server/calculations
+        g++ -o monte_carlo MonteCarlo.cpp -lm
         g++ -o binomial_tree BinomialTree.cpp -lm
         g++ -o black_scholes BlackScholes.cpp -lm
 
@@ -44,14 +44,17 @@ jobs:
       run: |
         echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
         chmod 600 key.pem
-        scp -i key.pem -r . ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/Option-Pricing/server
+        scp -i key.pem -r server/ ec2-user@${{ secrets.EC2_IP }}:/home/ec2-user/Option-Pricing/
       
-
-    - name: SSH into EC2 and restart Gunicorn/Nginx
+    - name: SSH into EC2 and deploy
       run: |
         ssh -i key.pem ec2-user@${{ secrets.EC2_IP }} << EOF
           cd /home/ec2-user/Option-Pricing/server
-          source venv/bin/activate  # Activate your virtual environment if used
+          if [ ! -d "venv" ]; then
+            python3.12 -m venv venv
+          fi
+          source venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
           sudo systemctl restart gunicorn
           sudo systemctl restart nginx
