@@ -21,7 +21,6 @@ def home():
 
 @app.route('/heatmap-data', methods=['POST'])
 def heatmap_data():
-    print(app_root)
 
     try:
         data = request.json
