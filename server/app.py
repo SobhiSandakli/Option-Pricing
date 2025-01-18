@@ -17,7 +17,7 @@ BINOMIAL_TREE_BINARY = os.path.join(app_root, 'calculations', 'binomial_tree')
 
 @app.route('/')
 def home():
-    return 'The api.optimap.ca is running!'
+    return 'The api.optimap.ca is running! Thanks for checking it out!'
 
 @app.route('/heatmap-data', methods=['POST'])
 def heatmap_data():
