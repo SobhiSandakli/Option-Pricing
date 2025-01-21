@@ -114,7 +114,7 @@ const HeatmapComponent = ({ heatmapData, volatilities, spotPrices }) => {
             plot_bgcolor: "white",
           }}
           config={{
-            responsive: true,
+            staticPlot: true ,
             displayModeBar: false,
           }}
           style={{ width: "100%", height: "100%" }}

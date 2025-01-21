@@ -7,6 +7,9 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
+import InputAdornment from "@mui/material/InputAdornment";
+import Tooltip from "@mui/material/Tooltip";
 
 function InputForm({ onSubmit }) {
   const [strikePrice, setStrikePrice] = useState("");
@@ -83,16 +86,23 @@ function InputForm({ onSubmit }) {
       setter(value);
     }
   };
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSubmit();
+    }
+  };
 
   return (
     <Box
-      component="form"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-      }}
-    >
+    component="form"
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+    }}
+    onKeyPress={handleKeyPress}
+  >
       <Typography variant="h5" gutterBottom>
         Input Parameters
       </Typography>
@@ -105,10 +115,23 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("spotPrice", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 50000 }}
+        inputProps={{
+          step: "0.001",
+          min: 0,
+          max: 50000,
+          inputMode: "decimal", // Helps mobile browsers display numeric keyboards
+          pattern: "[0-9]*", // Prevents non-numeric input
+        }}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="The current market price of the underlying asset.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -122,6 +145,7 @@ function InputForm({ onSubmit }) {
           },
         }}
       />
+
       <TextField
         label="Strike Price"
         variant="outlined"
@@ -131,10 +155,17 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("strikePrice", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 50000 }}
+        inputProps={{ step: "0.001", min: 0, max: 50000 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="The price at which the option can be exercised.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -159,10 +190,17 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("volatility", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 5000 }}
+        inputProps={{ step: "0.001", min: 0, max: 5000 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="Annualized standard deviation of returns.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -185,10 +223,17 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("timeToMaturity", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 99 }}
+        inputProps={{ step: "0.001", min: 0, max: 99 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="Number of months until the option expires.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -213,10 +258,17 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("riskFreeRate", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 99 }}
+        inputProps={{ step: "0.001", min: 0, max: 99 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="Annualized rate on a risk-free asset.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -233,42 +285,42 @@ function InputForm({ onSubmit }) {
         }}
       />
       <ToggleButtonGroup
-  color="primary"
-  value={selectedModel}
-  exclusive
-  onChange={handleModelChange}
-  aria-label="Model Type"
-  sx={{
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    overflow: "hidden",
-    "& .MuiToggleButton-root": {
-      backgroundColor: "#003f5c", // Unselected color
-      color: "#fff",
-      borderColor: "#fff",        // White outline
-      "&.Mui-selected": {
-        backgroundColor: "#4caf50", // Selected color
-        color: "#fff",
-      },
-      "&:hover": {
-        backgroundColor: "#227925", // Hover color
-        color: "#fff",
-      },
-      // Larger screens (≥659px)
-      "@media (min-width: 659px)": {
-        fontSize: "0.65rem",
-        width: "100%",
-        minWidth: "auto",
-        padding: "2px 6px",
-      },
-      // Smaller screens (<659px)
-      "@media (max-width: 658px)": {
-        flex: 1, // Let buttons fill available width
-      },
-    },
-  }}
->
+        color="primary"
+        value={selectedModel}
+        exclusive
+        onChange={handleModelChange}
+        aria-label="Model Type"
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          overflow: "hidden",
+          "& .MuiToggleButton-root": {
+            backgroundColor: "#003f5c", // Unselected color
+            color: "#fff",
+            borderColor: "#fff", // White outline
+            "&.Mui-selected": {
+              backgroundColor: "#4caf50", // Selected color
+              color: "#fff",
+            },
+            "&:hover": {
+              backgroundColor: "#227925", // Hover color
+              color: "#fff",
+            },
+            // Larger screens (≥659px)
+            "@media (min-width: 659px)": {
+              fontSize: "0.65rem",
+              width: "100%",
+              minWidth: "auto",
+              padding: "2px 6px",
+            },
+            // Smaller screens (<659px)
+            "@media (max-width: 658px)": {
+              flex: 1, // Let buttons fill available width
+            },
+          },
+        }}
+      >
         <ToggleButton value="Black-Scholes">Black-Scholes</ToggleButton>
         <ToggleButton value="Monte Carlo">Monte Carlo</ToggleButton>
         <ToggleButton value="Binomial">Binomial</ToggleButton>
