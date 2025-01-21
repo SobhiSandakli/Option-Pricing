@@ -105,7 +105,13 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("spotPrice", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 50000 }}
+        inputProps={{
+          step: "0.001",
+          min: 0,
+          max: 50000,
+          inputMode: "decimal", // Helps mobile browsers display numeric keyboards
+          pattern: "[0-9]*", // Prevents non-numeric input
+        }}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -122,6 +128,7 @@ function InputForm({ onSubmit }) {
           },
         }}
       />
+
       <TextField
         label="Strike Price"
         variant="outlined"
@@ -233,42 +240,42 @@ function InputForm({ onSubmit }) {
         }}
       />
       <ToggleButtonGroup
-  color="primary"
-  value={selectedModel}
-  exclusive
-  onChange={handleModelChange}
-  aria-label="Model Type"
-  sx={{
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    overflow: "hidden",
-    "& .MuiToggleButton-root": {
-      backgroundColor: "#003f5c", // Unselected color
-      color: "#fff",
-      borderColor: "#fff",        // White outline
-      "&.Mui-selected": {
-        backgroundColor: "#4caf50", // Selected color
-        color: "#fff",
-      },
-      "&:hover": {
-        backgroundColor: "#227925", // Hover color
-        color: "#fff",
-      },
-      // Larger screens (≥659px)
-      "@media (min-width: 659px)": {
-        fontSize: "0.65rem",
-        width: "100%",
-        minWidth: "auto",
-        padding: "2px 6px",
-      },
-      // Smaller screens (<659px)
-      "@media (max-width: 658px)": {
-        flex: 1, // Let buttons fill available width
-      },
-    },
-  }}
->
+        color="primary"
+        value={selectedModel}
+        exclusive
+        onChange={handleModelChange}
+        aria-label="Model Type"
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          overflow: "hidden",
+          "& .MuiToggleButton-root": {
+            backgroundColor: "#003f5c", // Unselected color
+            color: "#fff",
+            borderColor: "#fff", // White outline
+            "&.Mui-selected": {
+              backgroundColor: "#4caf50", // Selected color
+              color: "#fff",
+            },
+            "&:hover": {
+              backgroundColor: "#227925", // Hover color
+              color: "#fff",
+            },
+            // Larger screens (≥659px)
+            "@media (min-width: 659px)": {
+              fontSize: "0.65rem",
+              width: "100%",
+              minWidth: "auto",
+              padding: "2px 6px",
+            },
+            // Smaller screens (<659px)
+            "@media (max-width: 658px)": {
+              flex: 1, // Let buttons fill available width
+            },
+          },
+        }}
+      >
         <ToggleButton value="Black-Scholes">Black-Scholes</ToggleButton>
         <ToggleButton value="Monte Carlo">Monte Carlo</ToggleButton>
         <ToggleButton value="Binomial">Binomial</ToggleButton>
