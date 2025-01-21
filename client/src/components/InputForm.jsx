@@ -83,16 +83,23 @@ function InputForm({ onSubmit }) {
       setter(value);
     }
   };
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSubmit();
+    }
+  };
 
   return (
     <Box
-      component="form"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-      }}
-    >
+    component="form"
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+    }}
+    onKeyPress={handleKeyPress}
+  >
       <Typography variant="h5" gutterBottom>
         Input Parameters
       </Typography>
