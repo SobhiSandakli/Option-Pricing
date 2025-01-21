@@ -28,13 +28,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential
 
-    - name: Compile C++ code
-      run: |
-        cd server/calculations
-        g++ -o monte_carlo MonteCarlo.cpp -lm
-        g++ -o binomial_tree BinomialTree.cpp -lm
-        g++ -o black_scholes BlackScholes.cpp -lm
-
     - name: Add EC2 to known hosts
       run: |
         mkdir -p ~/.ssh
@@ -58,6 +51,15 @@ jobs:
             exit 1
           fi
           rm /home/ec2-user/Option-Pricing/project.tar.gz
+        EOF
+
+    - name: SSH into EC2 and compile C++ code
+      run: |
+        ssh -i key.pem ec2-user@${{ secrets.EC2_IP }} << EOF
+          cd /home/ec2-user/Option-Pricing/server/calculations
+          g++ -o monte_carlo MonteCarlo.cpp -lm
+          g++ -o binomial_tree BinomialTree.cpp -lm
+          g++ -o black_scholes BlackScholes.cpp -lm
         EOF
 
     - name: SSH into EC2 and deploy
