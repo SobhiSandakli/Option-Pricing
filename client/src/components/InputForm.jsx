@@ -138,7 +138,7 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("strikePrice", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 50000 }}
+        inputProps={{ step: "0.001", min: 0, max: 50000 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -166,7 +166,7 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("volatility", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 5000 }}
+        inputProps={{ step: "0.001", min: 0, max: 5000 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -192,7 +192,7 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("timeToMaturity", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 99 }}
+        inputProps={{ step: "0.001", min: 0, max: 99 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
@@ -220,7 +220,7 @@ function InputForm({ onSubmit }) {
         onBlur={(e) => handleBlur("riskFreeRate", e.target.value)}
         fullWidth
         required
-        inputProps={{ step: "0.001", min: 0, max: 99 }}
+        inputProps={{ step: "0.001", min: 0, max: 99 ,inputMode: "decimal", pattern: "[0-9]*",}}
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
