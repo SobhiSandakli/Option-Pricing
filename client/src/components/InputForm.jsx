@@ -7,6 +7,9 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
+import InputAdornment from "@mui/material/InputAdornment";
+import Tooltip from "@mui/material/Tooltip";
 
 function InputForm({ onSubmit }) {
   const [strikePrice, setStrikePrice] = useState("");
@@ -122,6 +125,13 @@ function InputForm({ onSubmit }) {
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="The current market price of the underlying asset.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -149,6 +159,13 @@ function InputForm({ onSubmit }) {
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="The price at which the option can be exercised.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -177,6 +194,13 @@ function InputForm({ onSubmit }) {
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="Annualized standard deviation of returns.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -203,6 +227,13 @@ function InputForm({ onSubmit }) {
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="Number of months until the option expires.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
@@ -231,6 +262,13 @@ function InputForm({ onSubmit }) {
         InputLabelProps={{ style: { color: "#fff" } }}
         InputProps={{
           style: { color: "white" },
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip title="Annualized rate on a risk-free asset.">
+                <InfoIcon style={{ color: "#fff", cursor: "pointer" }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
         }}
         sx={{
           ".MuiOutlinedInput-root": {
