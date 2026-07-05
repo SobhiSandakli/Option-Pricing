@@ -3,6 +3,18 @@
 #include <cmath>
 #include <algorithm> // For std::max
 #include <string>
+#include <sstream>
+
+// Parse a comma-separated list of numbers, e.g. "70,80,90"
+std::vector<double> parse_csv(const std::string& csv) {
+    std::vector<double> values;
+    std::stringstream ss(csv);
+    std::string item;
+    while (std::getline(ss, item, ',')) {
+        values.push_back(std::stod(item));
+    }
+    return values;
+}
 
 double binomialOptionPricing(int N, double S0, double K, double r, double T, double sigma, bool isCall) {
     // Calculate derived parameters
@@ -31,6 +43,39 @@ double binomialOptionPricing(int N, double S0, double K, double r, double T, dou
 }
 
 int main(int argc, char* argv[]) {
+    // Grid mode: price a whole spot x volatility grid in one invocation.
+    // Usage: grid <option_type> <spots_csv> <K> <T> <r> <vols_csv> <view> <reference_price>
+    // Output: one line per spot price, comma-separated values per volatility.
+    if (argc == 10 && std::string(argv[1]) == "grid") {
+        std::string option_type = argv[2];
+        std::vector<double> spots = parse_csv(argv[3]);
+        double K = std::stod(argv[4]);
+        double T = std::stod(argv[5]);
+        double r = std::stod(argv[6]);
+        std::vector<double> vols = parse_csv(argv[7]);
+        std::string view = argv[8];
+        double reference_price = std::stod(argv[9]);
+        int N = 100; // Number of time steps
+
+        if (option_type != "call" && option_type != "put") {
+            std::cerr << "Invalid option type. Use 'call' or 'put'.\n";
+            return 1;
+        }
+        bool isCall = (option_type == "call");
+
+        for (double S : spots) {
+            for (size_t j = 0; j < vols.size(); ++j) {
+                double price = binomialOptionPricing(N, S, K, r, T, vols[j], isCall);
+                if (view == "P&L") {
+                    price -= reference_price;
+                }
+                std::cout << (j ? "," : "") << price;
+            }
+            std::cout << "\n";
+        }
+        return 0;
+    }
+
     // Adjust the number of expected parameters:
     // <option_type> <S0> <K> <T> <r> <sigma> <view> <reference_price>
     if (argc != 9) {

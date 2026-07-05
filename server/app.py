@@ -35,60 +35,46 @@ def heatmap_data():
         if not spot_prices or not volatilities:
             return jsonify({"error": "Missing required spotPrices or volatilities"}), 400
 
-        # Compute reference_price only if we are using P&L view 
+        # Determine the binary based on the model
+        binaries = {
+            'Black-Scholes': BLACK_SCHOLES_BINARY,
+            'Monte Carlo': MONTE_CARLO_BINARY,
+            'Binomial': BINOMIAL_TREE_BINARY,
+        }
+        binary = binaries.get(model)
+        if binary is None:
+            return jsonify({"error": "Invalid model type"}), 400
+
+        # Compute reference_price only if we are using P&L view
         # and have at least 4 values for spot_prices/volatilities.
         reference_price = 0.0
         if view == "P&L" and len(spot_prices) > 3 and len(volatilities) > 3:
             # Use spot_prices[3] and volatilities[3] to compute the reference price once
             ref_spot = spot_prices[3]
             ref_vol = volatilities[3]
-
-            # Determine the binary based on the model
-            if model == 'Black-Scholes':
-                binary = BLACK_SCHOLES_BINARY
-                ref_args = [binary, option_type, str(ref_spot), str(K), str(T), str(r), str(ref_vol), view, "0"]
-            elif model == 'Monte Carlo':
-                binary = MONTE_CARLO_BINARY
-                ref_args = [binary, option_type, str(ref_spot), str(K), str(T), str(r), str(ref_vol), view, "0"]
-            elif model == 'Binomial':
-                binary = BINOMIAL_TREE_BINARY
-                ref_args = [binary, option_type, str(ref_spot), str(K), str(T), str(r), str(ref_vol), view, "0"]
-            else:
-                return jsonify({"error": "Invalid model type"}), 400
+            ref_args = [binary, option_type, str(ref_spot), str(K), str(T), str(r), str(ref_vol), view, "0"]
 
             ref_result = subprocess.run(ref_args, capture_output=True, text=True)
             if ref_result.returncode != 0:
                 return jsonify({"error": "Error computing reference price", "details": ref_result.stderr}), 500
-            
+
             reference_price = float(ref_result.stdout.strip())
 
-        heatmap_results = []
+        # Compute the entire spot x volatility grid in a single C++ invocation
+        # (one process instead of one per cell).
+        spots_csv = ",".join(str(S) for S in spot_prices)
+        vols_csv = ",".join(str(sigma) for sigma in volatilities)
+        args = [binary, "grid", option_type, spots_csv, str(K), str(T), str(r), vols_csv, view, str(reference_price)]
 
-        for S in spot_prices:
-            row = []
-            for sigma in volatilities:
-                # Build arguments
-                if model == 'Black-Scholes':
-                    binary = BLACK_SCHOLES_BINARY
-                    args = [binary, option_type, str(S), str(K), str(T), str(r), str(sigma), view, str(reference_price)]
-                elif model == 'Monte Carlo':
-                    binary = MONTE_CARLO_BINARY
-                    args = [binary, option_type, str(S), str(K), str(T), str(r), str(sigma), view, str(reference_price)]
-                elif model == 'Binomial':
-                    binary = BINOMIAL_TREE_BINARY
-                    args = [binary, option_type, str(S), str(K), str(T), str(r), str(sigma), view, str(reference_price)]
-                else:
-                    return jsonify({"error": "Invalid model type"}), 400
+        result = subprocess.run(args, capture_output=True, text=True)
+        if result.returncode != 0:
+            return jsonify({"error": "Error executing the C++ program", "details": result.stderr}), 500
 
-                # Call the C++ binary
-                result = subprocess.run(args, capture_output=True, text=True)
-                if result.returncode != 0:
-                    return jsonify({"error": "Error executing the C++ program", "details": result.stderr}), 500
-
-                price = round(float(result.stdout.strip()), 2)
-                row.append(price)
-
-            heatmap_results.append(row)
+        # One line per spot price; comma-separated values per volatility
+        heatmap_results = [
+            [round(float(value), 2) for value in line.split(",")]
+            for line in result.stdout.strip().splitlines()
+        ]
 
         return jsonify({"heatmap": heatmap_results})
 

@@ -2,6 +2,18 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <vector>
+
+// Parse a comma-separated list of numbers, e.g. "70,80,90"
+std::vector<double> parse_csv(const std::string& csv) {
+    std::vector<double> values;
+    std::stringstream ss(csv);
+    std::string item;
+    while (std::getline(ss, item, ',')) {
+        values.push_back(std::stod(item));
+    }
+    return values;
+}
 
 // Standard normal cumulative distribution function
 double norm_cdf(double x) {
@@ -28,6 +40,39 @@ double black_scholes_put(double S, double K, double T, double r, double sigma) {
 
 
 int main(int argc, char* argv[]) {
+    // Grid mode: price a whole spot x volatility grid in one invocation.
+    // Usage: grid <option_type> <spots_csv> <K> <T> <r> <vols_csv> <view> <reference_price>
+    // Output: one line per spot price, comma-separated values per volatility.
+    if (argc == 10 && std::string(argv[1]) == "grid") {
+        std::string option_type = argv[2];
+        std::vector<double> spots = parse_csv(argv[3]);
+        double K = std::stod(argv[4]);
+        double T = std::stod(argv[5]);
+        double r = std::stod(argv[6]);
+        std::vector<double> vols = parse_csv(argv[7]);
+        std::string view = argv[8];
+        double reference_price = std::stod(argv[9]);
+
+        if (option_type != "call" && option_type != "put") {
+            std::cerr << "Invalid option type. Use 'call' or 'put'.\n";
+            return 1;
+        }
+
+        for (double S : spots) {
+            for (size_t j = 0; j < vols.size(); ++j) {
+                double price = (option_type == "call")
+                    ? black_scholes_call(S, K, T, r, vols[j])
+                    : black_scholes_put(S, K, T, r, vols[j]);
+                if (view == "P&L") {
+                    price -= reference_price;
+                }
+                std::cout << (j ? "," : "") << price;
+            }
+            std::cout << "\n";
+        }
+        return 0;
+    }
+
     // Adjust the number of expected parameters:
     // <option_type> <S> <K> <T> <r> <sigma> <view> <reference_price>
     if (argc != 9) {
