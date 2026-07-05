@@ -6,12 +6,13 @@ import {
   Typography,
   ToggleButtonGroup,
   ToggleButton,
+  CircularProgress,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import InputAdornment from "@mui/material/InputAdornment";
 import Tooltip from "@mui/material/Tooltip";
 
-function InputForm({ onSubmit }) {
+function InputForm({ onSubmit, loading = false }) {
   const [strikePrice, setStrikePrice] = useState("");
   const [spotPrice, setSpotPrice] = useState("");
   const [volatility, setVolatility] = useState("");
@@ -359,14 +360,23 @@ function InputForm({ onSubmit }) {
         variant="contained"
         color="primary"
         onClick={handleSubmit}
+        disabled={loading}
+        startIcon={
+          loading ? <CircularProgress size={20} color="inherit" /> : null
+        }
         sx={{
           backgroundColor: "#4caf50", // Green color
           "&:hover": {
             backgroundColor: "#388e3c", // Darker green on hover
           },
+          "&.Mui-disabled": {
+            backgroundColor: "#4caf50",
+            color: "#fff",
+            opacity: 0.7,
+          },
         }}
       >
-        Calculate
+        {loading ? "Calculating…" : "Calculate"}
       </Button>
     </Box>
   );

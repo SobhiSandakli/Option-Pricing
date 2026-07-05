@@ -15,6 +15,7 @@ function Home() {
   const [putHeatmapData, setPutHeatmapData] = useState(null);
   const [volatilities, setVolatilities] = useState([]);
   const [spotPrices, setSpotPrices] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCalculate = async (formData) => {
     const {
@@ -49,6 +50,7 @@ function Home() {
     ];
     setVolatilities(calculatedVolatilities);
 
+    setIsLoading(true);
     try {
       const [callHeatmap, putHeatmap] = await Promise.all([
         fetchHeatmapData({
@@ -90,6 +92,8 @@ function Home() {
       setPutResult(putResponse.option_price);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -101,7 +105,7 @@ function Home() {
       <div className="layoutWrapper">
         {/* Input */}
         <div className="inputSection">
-          <InputForm onSubmit={handleCalculate} />
+          <InputForm onSubmit={handleCalculate} loading={isLoading} />
         </div>
 
         {/* Heatmaps */}
