@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+venv/
+server/venv/
+
+# Node
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# Office temp/lock files
+~$*
+
+# Compiled C++ binaries (rebuilt from source at deploy time)
+server/calculations/black_scholes
+server/calculations/monte_carlo
+server/calculations/binomial_tree
