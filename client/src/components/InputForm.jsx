@@ -69,6 +69,8 @@ function InputForm({ onSubmit }) {
     if (autoSubmit) {
       handleSubmit();
     }
+    // Deliberately re-run only when input values change (not on handleSubmit/autoSubmit identity)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     strikePrice,
     spotPrice,
