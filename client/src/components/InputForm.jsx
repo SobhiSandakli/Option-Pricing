@@ -67,9 +67,22 @@ function InputForm({ onSubmit, loading = false }) {
   };
 
   useEffect(() => {
-    if (autoSubmit) {
+    if (!autoSubmit) return;
+    // Only auto-submit once every field holds a valid, non-negative number;
+    // otherwise a mid-edit/cleared field would fire a request with NaN.
+    const allValid = [
+      strikePrice,
+      spotPrice,
+      volatility,
+      timeToMaturity,
+      riskFreeRate,
+    ].every((v) => v !== "" && !isNaN(v) && Number(v) >= 0);
+    if (!allValid) return;
+    // Debounce so typing "100" submits once, not on every keystroke
+    const timer = setTimeout(() => {
       handleSubmit();
-    }
+    }, 500);
+    return () => clearTimeout(timer);
     // Deliberately re-run only when input values change (not on handleSubmit/autoSubmit identity)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -88,6 +101,28 @@ function InputForm({ onSubmit, loading = false }) {
     if (regex.test(value) && value <= max) {
       setter(value);
     }
+  };
+
+  // Border colors: blue while a field is still being entered, green once it
+  // holds a confirmed valid value, red when blurred empty/invalid.
+  const HOVER_COLOR = "#64b5f6"; // in-progress (hover/focus, not yet confirmed)
+  const VALID_COLOR = "#4caf50"; // confirmed valid input
+  const ERROR_COLOR = "red";
+
+  const isFilled = (value) =>
+    value !== "" && !isNaN(value) && Number(value) >= 0;
+
+  const fieldSx = (value, valid) => {
+    const filled = isFilled(value);
+    const resting = !valid ? ERROR_COLOR : filled ? VALID_COLOR : "white";
+    const active = !valid ? ERROR_COLOR : filled ? VALID_COLOR : HOVER_COLOR;
+    return {
+      ".MuiOutlinedInput-root": {
+        "& fieldset": { borderColor: resting },
+        "&:hover fieldset": { borderColor: active },
+        "&.Mui-focused fieldset": { borderColor: active },
+      },
+    };
   };
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
@@ -136,17 +171,7 @@ function InputForm({ onSubmit, loading = false }) {
             </InputAdornment>
           ),
         }}
-        sx={{
-          ".MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: isValid.spotPrice ? "white" : "red" },
-            "&:hover fieldset": {
-              borderColor: isValid.spotPrice ? "#4caf50" : "red",
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: isValid.spotPrice ? "#4caf50" : "red",
-            },
-          },
-        }}
+        sx={fieldSx(spotPrice, isValid.spotPrice)}
       />
 
       <TextField
@@ -170,19 +195,7 @@ function InputForm({ onSubmit, loading = false }) {
             </InputAdornment>
           ),
         }}
-        sx={{
-          ".MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: isValid.strikePrice ? "white" : "red",
-            },
-            "&:hover fieldset": {
-              borderColor: isValid.strikePrice ? "#4caf50" : "red",
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: isValid.strikePrice ? "#4caf50" : "red",
-            },
-          },
-        }}
+        sx={fieldSx(strikePrice, isValid.strikePrice)}
       />
       <TextField
         label="Volatility (%)"
@@ -205,17 +218,7 @@ function InputForm({ onSubmit, loading = false }) {
             </InputAdornment>
           ),
         }}
-        sx={{
-          ".MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: isValid.volatility ? "white" : "red" },
-            "&:hover fieldset": {
-              borderColor: isValid.volatility ? "#4caf50" : "red",
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: isValid.volatility ? "#4caf50" : "red",
-            },
-          },
-        }}
+        sx={fieldSx(volatility, isValid.volatility)}
       />
       <TextField
         label="Time to Maturity (Months)"
@@ -238,19 +241,7 @@ function InputForm({ onSubmit, loading = false }) {
             </InputAdornment>
           ),
         }}
-        sx={{
-          ".MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: isValid.timeToMaturity ? "white" : "red",
-            },
-            "&:hover fieldset": {
-              borderColor: isValid.timeToMaturity ? "#4caf50" : "red",
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: isValid.timeToMaturity ? "#4caf50" : "red",
-            },
-          },
-        }}
+        sx={fieldSx(timeToMaturity, isValid.timeToMaturity)}
       />
       <TextField
         label="Risk-Free Interest Rate (%)"
@@ -273,19 +264,7 @@ function InputForm({ onSubmit, loading = false }) {
             </InputAdornment>
           ),
         }}
-        sx={{
-          ".MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: isValid.riskFreeRate ? "white" : "red",
-            },
-            "&:hover fieldset": {
-              borderColor: isValid.riskFreeRate ? "#4caf50" : "red",
-            },
-            "&.Mui-focused fieldset": {
-              borderColor: isValid.riskFreeRate ? "#4caf50" : "red",
-            },
-          },
-        }}
+        sx={fieldSx(riskFreeRate, isValid.riskFreeRate)}
       />
       <ToggleButtonGroup
         color="primary"
@@ -338,7 +317,7 @@ function InputForm({ onSubmit, loading = false }) {
           display: "flex",
           justifyContent: "center",
           "& .MuiToggleButton-root": {
-            backgroundColor: "##003f5c", // Navy for unselected
+            backgroundColor: "#003f5c", // Navy for unselected
             color: "#fff",
             borderColor: "#fff", // White outline
             "&.Mui-selected": {

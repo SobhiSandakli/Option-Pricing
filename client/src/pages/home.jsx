@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import InputForm from "../components/InputForm";
 import ResultDisplay from "../components/ResultDisplay";
 import HeatmapComponent from "../components/HeatMap";
-import { calculateOptionPrice, fetchHeatmapData } from "../services/api";
+import { fetchAllResults } from "../services/api";
 
 // Import the external CSS
 import "./Home.css";
@@ -52,44 +52,23 @@ function Home() {
 
     setIsLoading(true);
     try {
-      const [callHeatmap, putHeatmap] = await Promise.all([
-        fetchHeatmapData({
-          spotPrices: calculatedSpotPrices,
-          volatilities: calculatedVolatilities,
-          strikePrice,
-          timeToMaturity,
-          optionType: "call",
-          riskFreeRate,
-          modelType,
-          viewType,
-        }),
-        fetchHeatmapData({
-          spotPrices: calculatedSpotPrices,
-          volatilities: calculatedVolatilities,
-          strikePrice,
-          timeToMaturity,
-          optionType: "put",
-          riskFreeRate,
-          modelType,
-          viewType,
-        }),
-      ]);
+      // One request computes both heatmaps and both prices
+      const results = await fetchAllResults({
+        spotPrices: calculatedSpotPrices,
+        volatilities: calculatedVolatilities,
+        spotPrice: parseFloat(spotPrice),
+        volatility: parseFloat(volatility),
+        strikePrice,
+        timeToMaturity,
+        riskFreeRate,
+        modelType,
+        viewType,
+      });
 
-      const [callResponse, putResponse] = await Promise.all([
-        calculateOptionPrice({
-          ...formData,
-          optionType: "call",
-        }),
-        calculateOptionPrice({
-          ...formData,
-          optionType: "put",
-        }),
-      ]);
-
-      setCallHeatmapData(callHeatmap);
-      setPutHeatmapData(putHeatmap);
-      setCallResult(callResponse.option_price);
-      setPutResult(putResponse.option_price);
+      setCallHeatmapData(results.call.heatmap);
+      setPutHeatmapData(results.put.heatmap);
+      setCallResult(results.call.price);
+      setPutResult(results.put.price);
     } catch (error) {
       console.error(error);
     } finally {
@@ -117,8 +96,6 @@ function Home() {
               heatmapData={callHeatmapData}
               volatilities={volatilities}
               spotPrices={spotPrices}
-              callPrice={callResult}
-              putPrice={0}
             />
           </div>
           {/* Put Heatmap */}
@@ -128,8 +105,6 @@ function Home() {
               heatmapData={putHeatmapData}
               volatilities={volatilities}
               spotPrices={spotPrices}
-              callPrice={0}
-              putPrice={putResult}
             />
           </div>
         </div>

@@ -5,7 +5,7 @@ price and P&L respond to changes in market conditions. Enter the parameters of
 an option and instantly see its call/put value alongside heatmaps that sweep
 across spot price and volatility.
 
-**Live demo:** _add your Vercel URL here_
+**Live demo:** [option-pricing.vercel.app](https://option-pricing.vercel.app)
 
 ## Features
 
@@ -72,13 +72,15 @@ npm start   # serves on http://localhost:3000
 
   ```bash
   cd server
-  gcloud run deploy option-pricing-api --source . --region us-central1 --allow-unauthenticated
+  gcloud run deploy option-pricing-api --source . --region us-central1 --allow-unauthenticated --cpu-boost
   ```
+
+  `--cpu-boost` gives the container extra CPU during startup, which shortens
+  cold starts (the delay on the first request after the service has been idle).
 
 ## API
 
 | Endpoint         | Method | Description                                        |
 | ---------------- | ------ | -------------------------------------------------- |
 | `/`              | GET    | Health check                                       |
-| `/option-price`  | POST   | Price a single option                              |
-| `/heatmap-data`  | POST   | Price grid across spot prices × volatilities       |
+| `/calculate-all` | POST   | Call + put prices and heatmaps in one request      |
